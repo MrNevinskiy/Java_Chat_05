@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #808080;" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+    <children>
+        <MenuBar layoutY="-2.0" prefHeight="32.0" prefWidth="500.0">
+            <menus>
+                <Menu fx:id="menuBar" mnemonicParsing="false" text="Chat">
+                    <items>
+                        <MenuItem fx:id="menuReconnect" mnemonicParsing="false" onAction="#ConnectChat" text="Connect" />
+                        <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#closeChat" text="Close" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <Button fx:id="sendButton" layoutX="442.0" layoutY="422.0" mnemonicParsing="false" onAction="#sendMessage" prefHeight="49.0" prefWidth="44.0" text="Send" textAlignment="RIGHT" />
+        <TextArea fx:id="sendWindow" layoutX="14.0" layoutY="411.0" onKeyPressed="#keyListener" prefHeight="70.0" prefWidth="408.0" />
+        <TextArea fx:id="readWindow" editable="false" layoutX="14.0" layoutY="44.0" prefHeight="355.0" prefWidth="472.0">
+            <contextMenu>
+                <ContextMenu fx:id="contextMenu">
+                    <items>
+                        <MenuItem fx:id="contextCopy" mnemonicParsing="false" onAction="#copyWindow" text="Copy" />
+                        <MenuItem fx:id="contextClear" mnemonicParsing="false" onAction="#clearWindow" text="Clear" />
+                    </items>
+                </ContextMenu>
+            </contextMenu>
+        </TextArea>
+    </children>
+</AnchorPane>
