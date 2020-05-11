@@ -4,6 +4,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+
 public class StartClientUI extends Application {
 
     @Override
@@ -11,6 +12,7 @@ public class StartClientUI extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Chat");
         primaryStage.setScene(new Scene(root, 500, 500));
+//        primaryStage.setOnCloseRequest(controller.getCloseEventHandler());
         primaryStage.setResizable(false);
         primaryStage.show();
     }

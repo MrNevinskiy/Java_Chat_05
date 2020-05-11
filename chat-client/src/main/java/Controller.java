@@ -5,6 +5,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,7 +30,10 @@ public class Controller implements Initializable {
 
     }
 
-    public void closeChat(ActionEvent actionEvent) {
+    public void closeChat(ActionEvent actionEvent) throws IOException {
+        String messageExit = "/exit";
+        messageService.sendMessage(messageExit);
+        sendWindow.clear();
         System.exit(1);
     }
 
@@ -57,6 +61,24 @@ public class Controller implements Initializable {
         readWindow.clear();
 
     }
+
+//    private javafx.event.EventHandler<WindowEvent> closeEventHandler = new javafx.event.EventHandler<WindowEvent>() {
+//        @Override
+//        public void handle(WindowEvent event) {
+//            String messageExit = "/exit";
+//            try {
+//                messageService.sendMessage(messageExit);
+//                sendWindow.clear();
+//                System.exit(1);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    };
+//
+//    public javafx.event.EventHandler<WindowEvent> getCloseEventHandler(){
+//        return closeEventHandler;
+//    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
