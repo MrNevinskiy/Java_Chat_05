@@ -1,5 +1,7 @@
 package clientUI;
 
+import javafx.application.Platform;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,13 +22,20 @@ public class Network {
         this.outMessage = new DataOutputStream(socket.getOutputStream());
 
         new Thread(() -> {
-            try {
-                while (running) {
+            while (running) {
+                try {
                     String messageFromServer = inMessage.readUTF();
-                    iMessageService.readMessage(messageFromServer);
+                    Platform.runLater(() -> {
+                        try {
+                            iMessageService.readMessage(messageFromServer);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }).start();
     }

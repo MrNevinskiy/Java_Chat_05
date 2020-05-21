@@ -33,14 +33,9 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             this.iMessageService = new MessageService(chatWindow);
-            Network network = new Network("localhost", 8189, iMessageService);
-            ((MessageService) iMessageService).setNetwork(network);
             chatSize();
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Server error");
-            alert.setContentText(e.getMessage());
-            alert.show();
+            error(e);
         }
     }
 
@@ -79,8 +74,15 @@ public class Controller implements Initializable {
     public void sendMessage() throws IOException {
         String message = writeWindow.getText();
         iMessageService.sendMessage(message);
-        chatWindow.getItems().addAll(message);
+        chatWindow.getItems().addAll("Я: " + message);
         writeWindow.clear();
+    }
+
+    public void error(Exception exception){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Server error");
+        alert.setContentText(exception.getMessage());
+        alert.show();
     }
 
     public void chatSize(){
