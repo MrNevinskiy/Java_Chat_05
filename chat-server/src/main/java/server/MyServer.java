@@ -62,4 +62,12 @@ public class MyServer {
             clientHandler.sendMessage(message);
         }
     }
+
+    public synchronized void sendPrivateMessage(String nickLogin, String message) {
+        for (ClientHandler clientHandler: clients) {
+            if (clientHandler.getNickName().equals(nickLogin)){
+                clientHandler.sendMessage(message);
+            }
+        }
+    }
 }
