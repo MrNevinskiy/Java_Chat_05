@@ -10,5 +10,10 @@
         <module name="chat-server" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="chat-client" target="8" />
+      <module name="chat-server" target="8" />
+      <module name="Java_Chat_05" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

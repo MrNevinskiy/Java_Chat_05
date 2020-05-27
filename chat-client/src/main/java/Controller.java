@@ -1,7 +1,3 @@
-import clientUI.MessageService;
-import clientUI.Network;
-import clientUI.IMessageService;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -9,6 +5,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
@@ -17,35 +14,56 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
 
+    //Бар меню
     public Menu menuBar;
     public MenuItem menuReconnect;
     public MenuItem menuClose;
-    public Button outMessageButton;
-    public TextArea writeWindow;
-    public ListView<String> chatWindow;
+
+    //Доп. функции чата
     public javafx.scene.control.ContextMenu contextMenu;
     public MenuItem contextCopy;
     public MenuItem contextClear;
 
+    //Чат и поле ввода
+    public VBox chatPanel;
+    public ListView<String> chatWindow;
+    public TextArea writeWindow;
+    public Button outMessageButton;
+
+    //Строка состояни клиентов
+    public ListView onlineClient;
+
+    //Меню авторизации
+    public VBox authPanel;
+    public TextField loginField;
+    public PasswordField passField;
+
+    //Интерфейс
     private IMessageService iMessageService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            this.iMessageService = new MessageService(chatWindow);
+            this.iMessageService = new MessageService(this, true);
             chatSize();
         } catch (IOException e) {
             error(e);
         }
     }
 
-    public void ConnectChat(ActionEvent actionEvent) {
+    public void error(Exception exception){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Server error");
+        alert.setContentText(exception.getMessage());
+        alert.show();
+    }
+
+    public void connectChat(ActionEvent actionEvent) {
         // TODO: 27.04.2020
     }
 
     public void closeChat(ActionEvent actionEvent) throws IOException {
-        iMessageService.sendMessage("/exit");
-        System.exit(1);
+        iMessageService.close();
     }
 
     public void copyWindow(ActionEvent actionEvent) {
@@ -74,15 +92,8 @@ public class Controller implements Initializable {
     public void sendMessage() throws IOException {
         String message = writeWindow.getText();
         iMessageService.sendMessage(message);
-        chatWindow.getItems().addAll("Я: " + message);
+//        chatWindow.getItems().addAll("Я: " + message);
         writeWindow.clear();
-    }
-
-    public void error(Exception exception){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText("Server error");
-        alert.setContentText(exception.getMessage());
-        alert.show();
     }
 
     public void chatSize(){
@@ -104,17 +115,27 @@ public class Controller implements Initializable {
         });
     }
 
-    //Для коректного закрытия окна
-    private javafx.event.EventHandler<WindowEvent> closeEventHandler = new javafx.event.EventHandler<WindowEvent>() {
+    public void sendAuth(ActionEvent actionEvent) throws IOException {
+        String login = loginField.getText();
+        String password = passField.getText();
+        iMessageService.sendMessage(String.format("/auth %s %s", login, password));
+    }
+
+    //Для коректного закрытия окна через крестик
+    private final javafx.event.EventHandler<WindowEvent> closeEventHandler = new javafx.event.EventHandler<WindowEvent>() {
         @Override
         public void handle(WindowEvent event) {
             try {
-                iMessageService.sendMessage("/exit");
+                iMessageService.close();
                 System.exit(1);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     };
-    public javafx.event.EventHandler<WindowEvent> getCloseEventHandler() {return closeEventHandler;}
+
+    public javafx.event.EventHandler<WindowEvent> getCloseEventHandler() {
+        return closeEventHandler;
+    }
+
 }

@@ -8,13 +8,13 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #AAE3F2;" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
     <children>
-      <VBox alignment="TOP_CENTER" layoutX="-1.0" layoutY="1.0" prefHeight="600.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox fx:id="chatPanel" alignment="TOP_CENTER" layoutX="-1.0" layoutY="1.0" prefHeight="600.0" prefWidth="800.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
               <MenuBar prefHeight="25.0" prefWidth="800.0">
                   <menus>
                       <Menu fx:id="menuBar" mnemonicParsing="false" text="Chat">
                           <items>
-                              <MenuItem fx:id="menuReconnect" mnemonicParsing="false" onAction="#ConnectChat" text="Connect" />
+                              <MenuItem fx:id="menuReconnect" mnemonicParsing="false" onAction="#connectChat" text="Connect" />
                               <MenuItem fx:id="menuClose" mnemonicParsing="false" onAction="#closeChat" text="Close" />
                           </items>
                       </Menu>
@@ -42,7 +42,7 @@
                               </HBox>
                            </children>
                         </Pane>
-                        <ListView prefHeight="589.0" prefWidth="304.0" style="-fx-background-color: #85D1FF;" />
+                        <ListView fx:id="onlineClient" prefHeight="589.0" prefWidth="304.0" style="-fx-background-color: #85D1FF;" />
                      </children>
                   </VBox>
                   <VBox prefHeight="570.0" prefWidth="620.0">
@@ -76,6 +76,30 @@
                         </HBox>
                      </children>
                   </VBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox fx:id="authPanel" layoutX="70.0" layoutY="167.0" prefHeight="260.0" prefWidth="690.0">
+         <children>
+            <Pane prefHeight="123.0" prefWidth="691.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutY="14.0" prefHeight="100.0" prefWidth="690.0" text="Добро пожаловать в чат Berberis!" textAlignment="CENTER" textOverrun="CLIP">
+                     <font>
+                        <Font name="Times New Roman" size="24.0" />
+                     </font></Label>
+                  <ImageView fitHeight="90.0" fitWidth="100.0" layoutX="583.0" layoutY="19.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/ico.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <HBox prefHeight="50.0" prefWidth="691.0">
+               <children>
+                  <TextField fx:id="loginField" alignment="CENTER" prefHeight="50.0" prefWidth="300.0" promptText="Логин" />
+                  <PasswordField fx:id="passField" alignment="CENTER" prefHeight="50.0" prefWidth="300.0" promptText="Пароль" />
+                  <Button mnemonicParsing="false" onAction="#sendAuth" prefHeight="50.0" prefWidth="115.0" text="Войти" textAlignment="CENTER" />
                </children>
             </HBox>
          </children>
