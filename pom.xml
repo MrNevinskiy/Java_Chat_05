@@ -12,7 +12,6 @@
         <module>chat-client</module>
         <module>chat-server</module>
     </modules>
-
     <build>
         <plugins>
             <plugin>
