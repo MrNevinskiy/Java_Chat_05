@@ -41,25 +41,26 @@ public class ClientHandler {
 
     private void readMessage() throws IOException {
         while (true) {
-            String message = in.readUTF();
-            System.out.printf("Message %s from client %s%n", message, clientName);
+            String clientMessage = in.readUTF();
+            System.out.printf("Message %s from client %s%n", clientMessage, clientName);
 
-            if (message.equals("/exit")) {
+            if (clientMessage.equals("/exit")) {
                 return;
-            } else if (message.startsWith("/w")) {
-                String[] parts = message.split("\\s+");
+            }
+            else if (clientMessage.startsWith("/w")) {
+                String[] parts = clientMessage.split("\\s+");
                 if (parts.length < 3) {
-                    sendMessage("Error!" + message);
+                    sendMessage("Error!" + clientMessage);
                     continue;
                 }
 
-                String nickLogin = parts[1];
-                String messagePrivate = parts[2];
+                String receivedLogin = parts[1];
+                String message = parts[2];
 
-                myServer.sendPrivateMessage(nickLogin, clientName + ": " + messagePrivate);
+                myServer.sendPrivateMessage(receivedLogin, clientName + ": " + message);
 
             } else {
-                myServer.broadcastMessage(clientName + ": " + message);
+                myServer.broadcastMessage(clientName + ": " + clientMessage, this);
             }
         }
     }
@@ -67,23 +68,23 @@ public class ClientHandler {
     private void authentication() throws IOException {
 
         while (true) {
-        Timer timer = new Timer(true);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    synchronized (this) {
-                        if (clientName == null) {
-                            System.out.println("auth timeout");
-                            Thread.sleep(100);
-                            socket.close();
+            Timer timer = new Timer(true);
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        synchronized (this) {
+                            if (clientName == null) {
+                                System.out.println("auth timeout");
+                                Thread.sleep(100);
+                                socket.close();
+                            }
                         }
+                    } catch (InterruptedException | IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (InterruptedException | IOException e) {
-                    e.printStackTrace();
                 }
-            }
-        }, TIMEOUT);
+            }, TIMEOUT);
 
 
             String messageAuth = in.readUTF();
@@ -95,17 +96,18 @@ public class ClientHandler {
                 String nick = myServer.getAuthService().getNickByLoginPass(login, pass);
                 if (nick == null) {
                     sendMessage("Неверный логин или пароль. ");
-                    return;
+                    continue;
                 }
 
                 if (myServer.isNickBusy(nick)) {
                     sendMessage("Уже есть такой пользователь. ");
-                    return;
+                    continue;
                 }
                 sendMessage("/authok " + nick);
                 clientName = nick;
                 myServer.broadcastMessage(clientName + " is online. ");
                 myServer.subscribe(this);
+                break;
             }
         }
     }

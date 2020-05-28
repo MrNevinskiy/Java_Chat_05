@@ -92,7 +92,7 @@ public class Controller implements Initializable {
     public void sendMessage() throws IOException {
         String message = writeWindow.getText();
         iMessageService.sendMessage(message);
-//        chatWindow.getItems().addAll("Я: " + message);
+        chatWindow.getItems().addAll("Я: " + message);
         writeWindow.clear();
     }
 

@@ -46,8 +46,9 @@ public class Network implements Closeable {
         try {
             if (outMessage == null) {
                 initNetwork(serverAddress, port);
+            }else {
+                outMessage.writeUTF(message);
             }
-            outMessage.writeUTF(message);
         } catch (IOException e) {
             e.printStackTrace();
         }

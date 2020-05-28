@@ -7,6 +7,8 @@ import server.client.ClientHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class MyServer {
@@ -57,9 +59,12 @@ public class MyServer {
         return false;
     }
 
-    public synchronized void broadcastMessage(String message) {
+    public synchronized void broadcastMessage(String message, ClientHandler... unfilteredClients) {
+        List<ClientHandler> unfiltered = Arrays.asList(unfilteredClients);
         for (ClientHandler clientHandler : clients) {
-            clientHandler.sendMessage(message);
+            if(!unfiltered.contains(clientHandler)){
+                clientHandler.sendMessage(message);
+            }
         }
     }
 
@@ -67,6 +72,7 @@ public class MyServer {
         for (ClientHandler clientHandler: clients) {
             if (clientHandler.getNickName().equals(nickLogin)){
                 clientHandler.sendMessage(message);
+                break;
             }
         }
     }
