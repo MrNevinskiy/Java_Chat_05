@@ -97,9 +97,10 @@
             </Pane>
             <HBox prefHeight="50.0" prefWidth="691.0">
                <children>
-                  <TextField fx:id="loginField" alignment="CENTER" prefHeight="50.0" prefWidth="300.0" promptText="Логин" />
-                  <PasswordField fx:id="passField" alignment="CENTER" prefHeight="50.0" prefWidth="300.0" promptText="Пароль" />
-                  <Button mnemonicParsing="false" onAction="#sendAuth" prefHeight="50.0" prefWidth="115.0" text="Войти" textAlignment="CENTER" />
+                  <TextField fx:id="nameField" alignment="CENTER" prefHeight="50.0" prefWidth="200.0" promptText="Имя пользователя" />
+                  <TextField fx:id="loginField" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="200.0" promptText="Логин" />
+                  <PasswordField fx:id="passField" alignment="CENTER" prefHeight="50.0" prefWidth="200.0" promptText="Пароль" />
+                  <Button onAction="#sendAuth" prefHeight="68.0" prefWidth="91.0" text="Войти" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
          </children>

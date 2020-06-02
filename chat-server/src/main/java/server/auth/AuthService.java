@@ -1,6 +1,6 @@
 package server.auth;
 
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 
 public interface AuthService {
 

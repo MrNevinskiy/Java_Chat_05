@@ -1,3 +1,4 @@
+import chat.Message;
 import javafx.application.Platform;
 
 import java.io.Closeable;
@@ -13,10 +14,8 @@ public class Network implements Closeable {
     private final IMessageService iMessageService;
 
     private Socket socket;
-    private DataOutputStream outMessage;
-    private DataInputStream inMessage;
-
-    private boolean running = true;
+    private DataOutputStream outputStream;
+    private DataInputStream inputStream;
 
     public Network(String serverAddress, int port, IMessageService iMessageService) throws IOException {
         this.serverAddress = serverAddress;
@@ -26,30 +25,36 @@ public class Network implements Closeable {
 
     private void initNetwork(String serverAddress, int port) throws IOException {
         this.socket = new Socket(serverAddress, port);
-        this.inMessage = new DataInputStream(socket.getInputStream());
-        this.outMessage = new DataOutputStream(socket.getOutputStream());
+        this.inputStream = new DataInputStream(socket.getInputStream());
+        this.outputStream = new DataOutputStream(socket.getOutputStream());
 
-        new Thread(() -> {
-            while (running) {
-                try {
-                    String messageFromServer = inMessage.readUTF();
-                    Platform.runLater(() -> iMessageService.readMessage(messageFromServer));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
-                }
+        Thread readServerTread = new Thread(this::readMessageFromServer);
+        readServerTread.setDaemon(true);
+        readServerTread.start();
+    }
+
+    public void readMessageFromServer(){
+        while (true){
+            try {
+                String message = inputStream.readUTF();
+                Message msg = Message.fromJson(message);
+                Platform.runLater(()-> iMessageService.readMessage(msg));
+            } catch (Exception exception){
+                System.out.println("Ссоединение с сервером было потеряно.");
+                break;
             }
-        }).start();
+        }
     }
 
     public void send(String message) {
         try {
-            if (outMessage == null) {
+            if (outputStream == null) {
                 initNetwork(serverAddress, port);
             }else {
-                outMessage.writeUTF(message);
+                outputStream.writeUTF(message);
             }
         } catch (IOException e) {
+            System.out.println("Ошибка соединения с сервером.");
             e.printStackTrace();
         }
     }

@@ -1,5 +1,8 @@
 package server.client;
 
+import chat.Command;
+import chat.Message;
+import chat.message.AuthMessage;
 import server.MyServer;
 
 import java.io.DataInputStream;
@@ -11,7 +14,7 @@ import java.util.TimerTask;
 
 public class ClientHandler {
 
-    public static final int TIMEOUT = 15 * 1000;
+    public static final int TIMEOUT = 20 * 1000;
     private MyServer myServer;
     private String clientName;
 
@@ -42,86 +45,94 @@ public class ClientHandler {
     private void readMessage() throws IOException {
         while (true) {
             String clientMessage = in.readUTF();
-            System.out.printf("Message %s from client %s%n", clientMessage, clientName);
-
-            if (clientMessage.equals("/exit")) {
-                return;
-            }
-            else if (clientMessage.startsWith("/w")) {
-                String[] parts = clientMessage.split("\\s+");
-                if (parts.length < 3) {
-                    sendMessage("Error!" + clientMessage);
-                    continue;
-                }
-
-                String receivedLogin = parts[1];
-                String message = parts[2];
-
-                myServer.sendPrivateMessage(receivedLogin, clientName + ": " + message);
-
-            } else {
-                myServer.broadcastMessage(clientName + ": " + clientMessage, this);
+            System.out.printf("Message '%s' from client %s%n", clientMessage, clientName);
+            Message m = Message.fromJson(clientMessage);
+            switch (m.command) {
+                case PUBLIC_MESSAGE:
+                    myServer.broadcastMessage(m, this);
+                    break;
+                case PRIVATE_MESSAGE:
+                    myServer.sendPrivateMessage(m);
+                    break;
+                case END:
+                    return;
             }
         }
     }
 
-    private void authentication() throws IOException {
+    private void closeConnection() {
+        myServer.unsubscribe(this);
+        myServer.broadcastMessage(clientName + " is offline");
+        try {
+            socket.close();
+        } catch (IOException e) {
+            System.err.println("Failed to close socket!");
+            e.printStackTrace();
+        }
+    }
 
+    private void authentication() throws IOException {
         while (true) {
-            Timer timer = new Timer(true);
-            timer.schedule(new TimerTask() {
+            Timer timeoutTimer = new Timer(true);
+            timeoutTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     try {
                         synchronized (this) {
                             if (clientName == null) {
-                                System.out.println("auth timeout");
+                                System.out.println("authentication is terminated caused by timeout expired");
+                                sendMessage(Message.createAuthError("Истекло время ожидания подключения!"));
                                 Thread.sleep(100);
                                 socket.close();
                             }
                         }
-                    } catch (InterruptedException | IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }, TIMEOUT);
+            String clientMessage = in.readUTF();
+            synchronized (this) {
+                Message message = Message.fromJson(clientMessage);
+                if (message.command == Command.AUTH_MESSAGE) {
+                    AuthMessage authMessage = message.authMessage;
+                    String login = authMessage.login;
+                    String password = authMessage.password;
+                    String nick = myServer.getAuthService().getNickByLoginPass(login, password);
+                    if (nick == null) {
+                        sendMessage(Message.createAuthError("Неверные логин/пароль"));
+                        continue;
+                    }
 
-
-            String messageAuth = in.readUTF();
-            if (messageAuth.startsWith("/auth")) {
-                String[] loginAndPass = messageAuth.split("\\s+");
-                String login = loginAndPass[1];
-                String pass = loginAndPass[2];
-
-                String nick = myServer.getAuthService().getNickByLoginPass(login, pass);
-                if (nick == null) {
-                    sendMessage("Неверный логин или пароль. ");
-                    continue;
+                    if (myServer.isNickBusy(nick)) {
+                        sendMessage(Message.createAuthError("Учетная запись уже используется"));
+                        continue;
+                    }
+                    clientName = nick;
+                    sendMessage(Message.createAuthOk(clientName));
+                    myServer.broadcastMessage(Message.createPublic(null, clientName + " is online"));
+                    myServer.subscribe(this);
+                    break;
                 }
-
-                if (myServer.isNickBusy(nick)) {
-                    sendMessage("Уже есть такой пользователь. ");
-                    continue;
-                }
-                sendMessage("/authok " + nick);
-                clientName = nick;
-                myServer.broadcastMessage(clientName + " is online. ");
-                myServer.subscribe(this);
-                break;
             }
         }
     }
 
-    public void sendMessage(String message) {
+    private void sendMessage(Message message) {
+        sendMessage(message.toJson());
+    }
+
+    public void sendMessage(String message)  {
         try {
             out.writeUTF(message);
-            out.flush();
         } catch (IOException e) {
+            System.err.println("Failed to send message to user " + clientName + " : " + message);
             e.printStackTrace();
         }
     }
 
-    public String getNickName() {
+
+    public String getClientName() {
         return clientName;
     }
 }
