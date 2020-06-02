@@ -38,11 +38,11 @@ public class MyServer {
 
     }
 
-    public synchronized void subscribe(ClientHandler clientHandler){
+    public void subscribe(ClientHandler clientHandler){
         clients.add(clientHandler);
     }
 
-    public synchronized void unsubscribe(ClientHandler clientHandler){
+    public void unsubscribe(ClientHandler clientHandler){
         clients.remove(clientHandler);
     }
 
@@ -50,7 +50,7 @@ public class MyServer {
         return authService;
     }
 
-    public synchronized boolean isNickBusy(String nick){
+    public boolean isNickBusy(String nick){
         for (ClientHandler clientHandler: clients){
             if(clientHandler.getNickName().equals(nick)){
                 return true;
@@ -59,7 +59,7 @@ public class MyServer {
         return false;
     }
 
-    public synchronized void broadcastMessage(String message, ClientHandler... unfilteredClients) {
+    public void broadcastMessage(String message, ClientHandler... unfilteredClients) {
         List<ClientHandler> unfiltered = Arrays.asList(unfilteredClients);
         for (ClientHandler clientHandler : clients) {
             if(!unfiltered.contains(clientHandler)){
@@ -68,7 +68,7 @@ public class MyServer {
         }
     }
 
-    public synchronized void sendPrivateMessage(String nickLogin, String message) {
+    public void sendPrivateMessage(String nickLogin, String message) {
         for (ClientHandler clientHandler: clients) {
             if (clientHandler.getNickName().equals(nickLogin)){
                 clientHandler.sendMessage(message);
