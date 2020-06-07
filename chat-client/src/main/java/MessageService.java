@@ -2,9 +2,9 @@
 import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
+
 
 public class MessageService implements IMessageService {
 
@@ -49,8 +49,40 @@ public class MessageService implements IMessageService {
         }
     }
 
+    public void chatHistoryCreate(String message) {
+        try {
+            String chatHistoryName = "chat-client/src/main/resources/history/" + controller.loginField.getText() + ".txt";
+            File file = new File(chatHistoryName);
+            file.createNewFile();
+            try (PrintWriter out = new PrintWriter(new FileOutputStream(file, true))) {
+                out.println(message);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void chatHistory() {
+        try {
+            String chatHistoryName = "chat-client/src/main/resources/history/" + controller.loginField.getText() + ".txt";
+            File file = new File(chatHistoryName);
+            BufferedReader read = new BufferedReader(new FileReader(file));
+            while (true) {
+                String text = read.readLine();
+                if (text == null) {
+                    break;
+                }
+                controller.chatWindow.getItems().addAll(text);
+                controller.chatWindow.scrollTo(text);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void sendMessage(String message) {
+        chatHistoryCreate(message);
         network.send(message);
     }
 
@@ -58,14 +90,24 @@ public class MessageService implements IMessageService {
     public void readMessage(String message) {
         if (message.startsWith("/authok")) {
             controller.authPanel.setVisible(false);
+            controller.regPanel.setVisible(false);
             controller.chatPanel.setVisible(true);
+            chatHistoryCreate(message);
+            chatHistory();
         } else if (controller.authPanel.isVisible()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Ошибка авторизации: ");
             alert.setContentText(message);
             alert.showAndWait();
+
+        }else if (controller.regPanel.isVisible()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Ошибка регистрации: ");
+            alert.setContentText(message);
+            alert.showAndWait();
         } else {
             chatWindow.getItems().addAll("Server: " + message);
+            chatHistoryCreate(message);
         }
     }
 

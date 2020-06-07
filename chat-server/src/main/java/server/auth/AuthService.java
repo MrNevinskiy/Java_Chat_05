@@ -8,5 +8,8 @@ public interface AuthService {
     void stop();
 
     @Nullable
-    String getNickByLoginPass(String login, String pass);
+    boolean sighUpLoginPass(String login, String password);
+
+    @Nullable
+    String getNickByLoginPass(String login, String password);
 }

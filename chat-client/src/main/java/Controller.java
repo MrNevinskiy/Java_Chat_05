@@ -38,6 +38,13 @@ public class Controller implements Initializable {
     public TextField loginField;
     public PasswordField passField;
 
+    //Меню регистрации
+    public VBox regPanel;
+    public PasswordField signUpPass;
+    public TextField signUpLogin;
+    public TextField signUpName;
+
+
     //Интерфейс
     private IMessageService iMessageService;
 
@@ -72,7 +79,6 @@ public class Controller implements Initializable {
         final ClipboardContent content = new ClipboardContent();
         content.putString(copyText);
         clipboard.setContent(content);
-        //System.out.println(copyText);
     }
 
     public void clearWindow(ActionEvent actionEvent) {
@@ -90,9 +96,9 @@ public class Controller implements Initializable {
     }
 
     public void sendMessage() throws IOException {
-        String message = writeWindow.getText();
+        String message = "Я: " + writeWindow.getText();
         iMessageService.sendMessage(message);
-        chatWindow.getItems().addAll("Я: " + message);
+        chatWindow.getItems().addAll(message);
         writeWindow.clear();
     }
 
@@ -119,6 +125,19 @@ public class Controller implements Initializable {
         String login = loginField.getText();
         String password = passField.getText();
         iMessageService.sendMessage(String.format("/auth %s %s", login, password));
+    }
+
+    public void signUpButton(ActionEvent actionEvent) {
+        chatPanel.setVisible(false);
+        authPanel.setVisible(false);
+        regPanel.setVisible(true);
+    }
+
+    public void regButton(ActionEvent actionEvent) {
+        //String userName = signUpName.getText();
+        String userLogin = signUpLogin.getText();
+        String userPassword = signUpPass.getText();
+        iMessageService.sendMessage(String.format("/reg %s %s ", userLogin, userPassword));
     }
 
     //Для коректного закрытия окна через крестик

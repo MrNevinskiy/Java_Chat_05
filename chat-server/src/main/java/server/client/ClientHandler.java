@@ -11,7 +11,7 @@ import java.util.TimerTask;
 
 public class ClientHandler {
 
-    public static final int TIMEOUT = 15 * 1000;
+    public static final int TIMEOUT = 200 * 1000;
     private MyServer myServer;
     private String clientName;
 
@@ -45,6 +45,7 @@ public class ClientHandler {
             System.out.printf("Message %s from client %s%n", clientMessage, clientName);
 
             if (clientMessage.equals("/exit")) {
+                myServer.unsubscribe(this);
                 return;
             }
             else if (clientMessage.startsWith("/w")) {
@@ -65,6 +66,18 @@ public class ClientHandler {
         }
     }
 
+    private void closeConnection() {
+
+        myServer.unsubscribe(this);
+        myServer.broadcastMessage(clientName + " is offline");
+        try {
+            socket.close();
+        } catch (IOException e) {
+            System.err.println("Failed to close socket!");
+            e.printStackTrace();
+        }
+    }
+
     private void authentication() throws IOException {
 
         while (true) {
@@ -77,15 +90,14 @@ public class ClientHandler {
                             if (clientName == null) {
                                 System.out.println("auth timeout");
                                 Thread.sleep(100);
-                                socket.close();
+                                closeConnection();
                             }
                         }
-                    } catch (InterruptedException | IOException e) {
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }, TIMEOUT);
-
 
             String messageAuth = in.readUTF();
             if (messageAuth.startsWith("/auth")) {
@@ -93,9 +105,13 @@ public class ClientHandler {
                 String login = loginAndPass[1];
                 String pass = loginAndPass[2];
 
+                if (messageAuth.equals("/exit")){
+                    closeConnection();
+                }
+
                 String nick = myServer.getAuthService().getNickByLoginPass(login, pass);
                 if (nick == null) {
-                    sendMessage("Неверный логин или пароль. ");
+                    sendMessage("Неверный логин или пароль.");
                     continue;
                 }
 
@@ -108,6 +124,32 @@ public class ClientHandler {
                 myServer.broadcastMessage(clientName + " is online. ");
                 myServer.subscribe(this);
                 break;
+
+            } else if (messageAuth.startsWith("/reg")) {
+
+                String[] loginAndPass = messageAuth.split("\\s+");
+//                String userName = loginAndPass[1];
+                String userLogin = loginAndPass[1];
+                String userPassword = loginAndPass[2];
+
+                if (messageAuth.equals("/exit")){
+                    closeConnection();
+                }
+
+                boolean nick = myServer.getAuthService().sighUpLoginPass(userLogin,userPassword);
+                if (!nick) {
+                    sendMessage("Данный профиль уже существует.");
+                    continue;
+                }
+
+                sendMessage("/authok " + userLogin);
+                clientName = userLogin;
+                myServer.broadcastMessage(clientName + " is online. ");
+                myServer.subscribe(this);
+                break;
+
+            } else if (messageAuth.startsWith("/exit")){
+                closeConnection();
             }
         }
     }

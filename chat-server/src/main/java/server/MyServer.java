@@ -19,17 +19,19 @@ public class MyServer {
 
     private ConcurrentLinkedDeque<ClientHandler> clients = new ConcurrentLinkedDeque<>();
 
+
     public MyServer(){
         System.out.println("Server running.");
         try(ServerSocket serverSocket = new ServerSocket(PORT)){
             authService.start();
+            Auth.dbDriver();
             while (true){
                 System.out.println("Awaiting client...");
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected...");
                 new ClientHandler(this, socket);
             }
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error Server " + e.getMessage());
             e.printStackTrace();
         } finally {

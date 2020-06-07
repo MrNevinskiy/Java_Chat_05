@@ -102,6 +102,41 @@
                   <Button mnemonicParsing="false" onAction="#sendAuth" prefHeight="50.0" prefWidth="115.0" text="Войти" textAlignment="CENTER" />
                </children>
             </HBox>
+            <Pane prefHeight="75.0" prefWidth="690.0">
+               <children>
+                  <Button layoutX="160.0" layoutY="14.0" mnemonicParsing="false" onAction="#signUpButton" prefHeight="48.0" prefWidth="371.0" text="Зарегистрироваться" />
+               </children>
+            </Pane>
+         </children>
+      </VBox>
+      <VBox fx:id="regPanel" layoutX="18.0" layoutY="167.0" prefHeight="260.0" prefWidth="762.0" visible="false">
+         <children>
+            <Pane prefHeight="123.0" prefWidth="691.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutY="14.0" prefHeight="100.0" prefWidth="690.0" text="Добро пожаловать в чат Berberis!" textAlignment="CENTER" textOverrun="CLIP">
+                     <font>
+                        <Font name="Times New Roman" size="24.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="90.0" fitWidth="100.0" layoutX="583.0" layoutY="19.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/ico.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </Pane>
+            <HBox prefHeight="50.0" prefWidth="691.0">
+               <children>
+                  <TextField fx:id="signUpName" alignment="CENTER" disable="true" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="300.0" promptText="Логин" />
+                  <TextField fx:id="signUpLogin" alignment="CENTER" prefHeight="50.0" prefWidth="300.0" promptText="Логин" />
+                  <PasswordField fx:id="signUpPass" alignment="CENTER" prefHeight="50.0" prefWidth="300.0" promptText="Пароль" />
+               </children>
+            </HBox>
+            <Pane prefHeight="75.0" prefWidth="690.0">
+               <children>
+                  <Button layoutX="196.0" layoutY="14.0" mnemonicParsing="false" onAction="#regButton" prefHeight="48.0" prefWidth="371.0" text="Зарегистрироваться" />
+               </children>
+            </Pane>
          </children>
       </VBox>
     </children>
