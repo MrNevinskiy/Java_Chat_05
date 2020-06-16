@@ -55,7 +55,7 @@ public class MessageService implements IMessageService {
             File file = new File(chatHistoryName);
             file.createNewFile();
             try (PrintWriter out = new PrintWriter(new FileOutputStream(file, true))) {
-                out.println(message);
+                    out.println(message);
             }
         } catch (IOException e) {
             e.printStackTrace();

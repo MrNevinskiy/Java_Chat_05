@@ -133,6 +133,12 @@ public class Controller implements Initializable {
         regPanel.setVisible(true);
     }
 
+    public void signInButton(ActionEvent actionEvent) {
+        chatPanel.setVisible(false);
+        authPanel.setVisible(true);
+        regPanel.setVisible(false);
+    }
+
     public void regButton(ActionEvent actionEvent) {
         //String userName = signUpName.getText();
         String userLogin = signUpLogin.getText();
